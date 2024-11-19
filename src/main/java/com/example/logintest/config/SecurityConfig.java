@@ -21,28 +21,31 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(); //패스워드 암호화하는 클래스
     }
 
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        String userName = "user2";
-        String password = "1234";
-        UserDetails user = User.builder()
-                .username(userName)
-                .password(passwordEncoder().encode(password))
-                .roles("USER")
-                .build();
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsService() {
+//        String userName = "user2";
+//        String password = "1234";
+//        UserDetails user = User.builder()
+//                .username(userName)
+//                .password(passwordEncoder().encode(password))
+//                .roles("USER")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(user);
+//    }
 
-        return new InMemoryUserDetailsManager(user);
-    }
-
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests((auth) -> {
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.authorizeHttpRequests((auth) -> {
             // /sample/all은 아무나 다 접근 가능
             auth.requestMatchers("/sample/all").permitAll();
+            auth.requestMatchers("/sample/member").hasRole("USER");
         });
 
-        http.formLogin();
+        httpSecurity.formLogin();
+        httpSecurity.csrf().disable();
+        httpSecurity.logout();
 
-        return http.build();
+        return httpSecurity.build();
     }
 }
